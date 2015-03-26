@@ -42,18 +42,19 @@ class RestClient(object):
         buckets = dict()
         data = self._request('pools/default/buckets')
         for bucket in data:
-            name = bucket['name']
-            buckets[name] = dict()
-            buckets[name]['password'] = bucket['saslPassword']
+            if bucket['bucketType'] == "membase":
+                name = bucket['name']
+                buckets[name] = dict()
+                buckets[name]['password'] = bucket['saslPassword']
 
-            vbid = 0
-            map = dict()
-            nodes = bucket['vBucketServerMap']['serverList']
-            vbmap = bucket['vBucketServerMap']['vBucketMap']
-            for vbucket in vbmap:
-                map[vbid] = nodes[vbucket[0]].encode('ascii')
-                vbid += 1
-            buckets[name]['vbmap'] = map
+                vbid = 0
+                map = dict()
+                nodes = bucket['vBucketServerMap']['serverList']
+                vbmap = bucket['vBucketServerMap']['vBucketMap']
+                for vbucket in vbmap:
+                    map[vbid] = nodes[vbucket[0]].encode('ascii')
+                    vbid += 1
+                buckets[name]['vbmap'] = map
 
         self.buckets = buckets
 
